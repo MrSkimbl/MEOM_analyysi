@@ -7,6 +7,16 @@ from openai import OpenAI
 import json
 
 
+def safe_print(text):
+    """Windows-yhteensopiva tulostus"""
+    try:
+        print(text)
+    except UnicodeEncodeError:
+        # Korvaa ongelmalliset merkit
+        text = text.encode('ascii', 'ignore').decode('ascii')
+        print(text)
+
+
 def analyze_target_company(target_url: str, api_key: str = None) -> dict:
     """
     Analysoi kohdeyrityksen palvelut, asiakkaat ja positioning
@@ -249,23 +259,23 @@ def print_company_analysis(analysis: dict):
     print(f"\nYritys: {analysis.get('company_name', 'N/A')}")
     print(f"URL: {analysis.get('url', 'N/A')}")
     
-    print(f"\nPalvelut:")
+    safe_print(f"\nPalvelut:")
     for service in analysis.get('services', []):
-        print(f"  - {service}")
+        safe_print(f"  - {service}")
     
     if analysis.get('products'):
-        print(f"\nTuotteet:")
+        safe_print(f"\nTuotteet:")
         for product in analysis.get('products', []):
-            print(f"  - {product}")
+            safe_print(f"  - {product}")
     
-    print(f"\nAsiakaskunta: {analysis.get('target_customers', 'N/A')}")
+    safe_print(f"\nAsiakaskunta: {analysis.get('target_customers', 'N/A')}")
     
-    print(f"\nAsiakassegmentit:")
+    safe_print(f"\nAsiakassegmentit:")
     for segment in analysis.get('customer_segments', []):
-        print(f"  - {segment}")
+        safe_print(f"  - {segment}")
     
-    print(f"\nValue Proposition:")
-    print(f"  {analysis.get('value_proposition', 'N/A')}")
+    safe_print(f"\nValue Proposition:")
+    safe_print(f"  {analysis.get('value_proposition', 'N/A')}")
     
     print("\n" + "=" * 60)
 
@@ -288,11 +298,11 @@ def print_competitor_summary(data: dict):
     print("-" * 60)
     
     for i, comp in enumerate(data.get('competitors', []), 1):
-        print(f"\n{i}. {comp.get('name', 'N/A')}")
-        print(f"   URL: {comp.get('url', 'N/A')}")
-        print(f"   Kuvaus: {comp.get('description', 'N/A')}")
+        safe_print(f"\n{i}. {comp.get('name', 'N/A')}")
+        safe_print(f"   URL: {comp.get('url', 'N/A')}")
+        safe_print(f"   Kuvaus: {comp.get('description', 'N/A')}")
         if comp.get('similarity_reason'):
-            print(f"   Kilpailija koska: {comp.get('similarity_reason', 'N/A')}")
+            safe_print(f"   Kilpailija koska: {comp.get('similarity_reason', 'N/A')}")
     
     print("\n" + "=" * 60)
 

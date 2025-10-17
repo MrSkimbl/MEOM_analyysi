@@ -19,6 +19,10 @@ from src.competitor_finder import (
     print_company_analysis,
     print_competitor_summary
 )
+from src.customer_extractor import (
+    extract_all_companies_customers,
+    print_customer_summary
+)
 
 
 def main():
@@ -57,8 +61,8 @@ Esimerkit:
     parser.add_argument(
         "--step",
         type=int,
-        choices=[1, 2, 3, 4, 5, 6, 7],
-        help="Aja vain tietty vaihe (testaus)"
+        choices=[1, 3, 4, 5, 6, 7],
+        help="Aja vain tietty vaihe (testaus): 1=kilpailijat, 3=asiakkaat, jne."
     )
     
     args = parser.parse_args()
@@ -120,11 +124,39 @@ Esimerkit:
             print("\n[TESTI] Vaihe 1 (1A + 1B) suoritettu. Lopetetaan.")
             return 0
         
-        # TODO: Vaihe 2: URL-validointi
-        print("\n[INFO] Vaihe 2: URL-validointi (tulossa...)")
+        # VAIHE 3: Asiakasreferenssien haku
+        print("\n" + "=" * 60)
+        print("VAIHE 3/7: Asiakasreferenssien haku")
+        print("=" * 60 + "\n")
         
-        # TODO: Vaihe 3: Asiakasreferenssien haku
-        print("[INFO] Vaihe 3: Asiakasreferenssien haku (tulossa...)")
+        # Yhdistä kohdeyritys ja kilpailijat
+        all_companies = [
+            {
+                "name": competitor_data.get('target_company'),
+                "url": competitor_data.get('target_url')
+            }
+        ]
+        all_companies.extend([
+            {
+                "name": comp.get('name'),
+                "url": comp.get('url')
+            }
+            for comp in competitor_data.get('competitors', [])
+        ])
+        
+        # Hae asiakkaat kaikilta
+        customers_by_company = extract_all_companies_customers(
+            companies=all_companies,
+            api_key=api_key
+        )
+        
+        # Tulosta yhteenveto
+        print_customer_summary(customers_by_company)
+        
+        # Jos testataan vain vaiheeseen 3, lopeta tähän
+        if args.step == 3:
+            print("\n[TESTI] Vaihe 3 suoritettu. Lopetetaan.")
+            return 0
         
         # TODO: Vaihe 4: Asiakassegmentointi
         print("[INFO] Vaihe 4: Asiakassegmentointi (tulossa...)")

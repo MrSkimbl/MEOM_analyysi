@@ -23,6 +23,23 @@ from src.customer_extractor import (
     extract_all_companies_customers,
     print_customer_summary
 )
+from src.segmentation import (
+    create_icps,
+    print_icp_summary
+)
+from src.copy_extractor import (
+    extract_all_companies_copy,
+    print_copy_summary
+)
+from src.positioning import (
+    analyze_positioning,
+    print_positioning_summary,
+    create_positioning_matrix
+)
+from src.report_generator import (
+    generate_html_report,
+    print_report_summary
+)
 
 
 def main():
@@ -62,7 +79,7 @@ Esimerkit:
         "--step",
         type=int,
         choices=[1, 3, 4, 5, 6, 7],
-        help="Aja vain tietty vaihe (testaus): 1=kilpailijat, 3=asiakkaat, jne."
+        help="Aja vain tietty vaihe (testaus): 1=kilpailijat, 3=asiakkaat, 4=ICP, 5=copyt, jne."
     )
     
     args = parser.parse_args()
@@ -158,20 +175,88 @@ Esimerkit:
             print("\n[TESTI] Vaihe 3 suoritettu. Lopetetaan.")
             return 0
         
-        # TODO: Vaihe 4: Asiakassegmentointi
-        print("[INFO] Vaihe 4: Asiakassegmentointi (tulossa...)")
+        # VAIHE 4: ICP-analyysi
+        print("\n" + "=" * 60)
+        print("VAIHE 4/7: ICP (Ideal Customer Profile) -analyysi")
+        print("=" * 60 + "\n")
         
-        # TODO: Vaihe 5: Etusivujen copyt
-        print("[INFO] Vaihe 5: Etusivujen copyt (tulossa...)")
+        icp_data = create_icps(
+            customers_by_company=customers_by_company,
+            api_key=api_key
+        )
         
-        # TODO: Vaihe 6: Positioning-analyysi
-        print("[INFO] Vaihe 6: Positioning-analyysi (tulossa...)")
+        # Tulosta yhteenveto
+        print_icp_summary(icp_data)
         
-        # TODO: Vaihe 7: HTML-raportti
-        print("[INFO] Vaihe 7: HTML-raportti (tulossa...)")
+        # Jos testataan vain vaiheeseen 4, lopeta tähän
+        if args.step == 4:
+            print("\n[TESTI] Vaihe 4 suoritettu. Lopetetaan.")
+            return 0
+        
+        # VAIHE 5: Etusivujen copyjen haku
+        print("\n" + "=" * 60)
+        print("VAIHE 5/7: Etusivujen copyjen haku")
+        print("=" * 60 + "\n")
+        
+        # Käytä samaa all_companies -listaa kuin vaiheessa 3
+        copies_by_company = extract_all_companies_copy(
+            companies=all_companies
+        )
+        
+        # Tulosta yhteenveto
+        print_copy_summary(copies_by_company)
+        
+        # Jos testataan vain vaiheeseen 5, lopeta tähän
+        if args.step == 5:
+            print("\n[TESTI] Vaihe 5 suoritettu. Lopetetaan.")
+            return 0
+        
+        # VAIHE 6: Positioning-analyysi
+        print("\n" + "=" * 60)
+        print("VAIHE 6/7: Positioning-analyysi")
+        print("=" * 60 + "\n")
+        
+        positioning_data = analyze_positioning(
+            companies=all_companies,
+            icps=icp_data.get('icps', []),
+            copies_by_company=copies_by_company,
+            api_key=api_key
+        )
+        
+        # Tulosta yhteenveto
+        print_positioning_summary(
+            positioning_data=positioning_data,
+            icps=icp_data.get('icps', [])
+        )
+        
+        # Luo matriisi (käytetään HTML-raportissa)
+        matrix = create_positioning_matrix(positioning_data)
+        
+        # Jos testataan vain vaiheeseen 6, lopeta tähän
+        if args.step == 6:
+            print("\n[TESTI] Vaihe 6 suoritettu. Lopetetaan.")
+            return 0
+        
+        # VAIHE 7: HTML-raportti
+        print("\n" + "=" * 60)
+        print("VAIHE 7/7: HTML-raportin generointi")
+        print("=" * 60 + "\n")
+        
+        output_file = generate_html_report(
+            company_analysis=company_analysis,
+            competitor_data=competitor_data,
+            customers_by_company=customers_by_company,
+            icp_data=icp_data,
+            copies_by_company=copies_by_company,
+            positioning_data=positioning_data,
+            output_file=args.output
+        )
+        
+        # Tulosta yhteenveto
+        print_report_summary(output_file)
         
         print("\n" + "=" * 60)
-        print("ANALYYSI VALMIS (osittain - kehityksessä)")
+        print("ANALYYSI VALMIS!")
         print("=" * 60)
         
         return 0

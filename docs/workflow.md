@@ -2,359 +2,270 @@
 
 ## Yleiskuva
 
-Työkalu suorittaa seitsemän vaihetta lineaarisesti ja tuottaa lopulta HTML-raportin.
-
 ```
-Input: URL → [1-7 vaiheet] → Output: HTML-raportti
+Input: URL → [7 vaihetta] → Output: HTML-raportti
+Kesto: 10-15 min (6 yritystä)
 ```
-
-## Vaihe 1: URL-validointi ja käsittely
-
-**Input**: Käyttäjän antama URL komentorivillä
-
-**Prosessi**:
-1. Validoi URL-muoto
-2. Tarkista että sivusto on tavoitettavissa
-3. Hae yrityksen nimi ja perustiedot
-
-**Output**: 
-- Validoitu URL
-- Yrityksen nimi
-
-**OpenAI-käyttö**: Ei tässä vaiheessa (vain tekninen validointi)
 
 ---
 
-## Vaihe 2: Kilpailijoiden haku
+## Vaihe 1A: Kohdeyrityksen analyysi
 
-**Input**: Alkuperäinen URL ja yrityksen nimi
+**API**: GPT-5 Responses API (EI web search)
 
 **Prosessi**:
-1. Käytetään OpenAI:n web search -toimintoa
-2. Etsitään 5 pääkilpailijaa Suomen markkinassa
-3. Validoidaan löydetyt kilpailijat
+1. Analysoi yritys URL:n perusteella
+2. Tunnista palvelut, tuotteet, asiakaskunta
+3. Palauta JSON
 
-**OpenAI Prompt**:
+**Output**:
+```json
+{
+  "company_name": "Yritys Oy",
+  "services": ["Palvelu 1", "Palvelu 2"],
+  "target_customers": "Kuvaus",
+  "value_proposition": "Ydinviesti",
+  "analysis": "Yhteenveto"
+}
 ```
-Etsi 5 pääkilpailijaa yritykselle "{yrityksen_nimi}" ({url}) Suomen markkinassa.
-Keskity yrityksiin, jotka:
-- Toimivat Suomessa
-- Tarjoavat samankaltaisia tuotteita/palveluita
+
+---
+
+## Vaihe 1B: Kilpailijoiden haku
+
+**API**: GPT-5 Responses API + **Web Search**
+
+**Prosessi**:
+1. Käytä vaiheen 1A analyysiä kontekstina
+2. Hae kilpailijoita web searchilla
+3. Suodata Suomen markkinaan
+4. Palauta 5 kilpailijaa
+
+**Prompt**:
+```
+Yritys: {company_name}
+Palvelut: {services}
+Asiakkaat: {target_customers}
+
+Etsi 5 kilpailijaa Suomen markkinassa jotka:
+- Tarjoavat samankaltaisia palveluita
+- Kilpailevat samoista asiakkaista
 - Ovat merkittäviä toimijoita
-
-Palauta lista muodossa:
-1. Yrityksen nimi - URL
-2. Yrityksen nimi - URL
-...
 ```
 
-**Output**: 
-- Lista 5 kilpailijan nimeä ja URL:ia
-- Yhteensä 6 yritystä analysoitavana (alkuperäinen + 5 kilpailijaa)
+**Output**: 5 kilpailijaa (nimi + URL)
 
 ---
 
 ## Vaihe 3: Asiakasreferenssien haku
 
-**Input**: 6 yrityksen URL:it
+**Teknologiat**: BeautifulSoup4 + GPT-5
 
-**Prosessi (kullekin yritykselle)**:
-1. **Web scraping**: Hae yrityksen sivusto
-2. **Sivujen tunnistus**: Etsi sivuja, joilla voi olla asiakasreferenssejä:
-   - /asiakkaat, /referenssit, /cases, /customers
-   - /portfolio, /projektit
-3. **Tekstin purku**: Käytä BeautifulSoup4 tekstin erottamiseen
-4. **AI-ekstrahointi**: OpenAI tunnistaa asiakasnimet tekstistä
+**Prosessi (per yritys)**:
+1. Etsi asiakassivuja: `/asiakkaat`, `/referenssit`, `/case`
+2. Scrappaa sivut BeautifulSoup4:llä
+3. Lähetä teksti GPT-5:lle
+4. Pura asiakasnimet JSON:na
 
-**OpenAI Prompt** (per yritys):
+**Prompt**:
 ```
-Analysoi seuraava teksti yrityksen "{yritys}" sivustolta.
-Etsi ja listaa kaikki mainitut asiakkaiden/referenssiasiakkaiden nimet.
+Analysoi teksti ja etsi asiakkaiden nimet.
 
-Teksti:
-{sivuston_teksti}
+Palauta JSON:
+{
+  "customers": ["Asiakas 1", "Asiakas 2"]
+}
 
-Palauta pelkästään lista yritysnimiä, yksi per rivi.
-Älä sisällytä henkilönimiä, vain yritysten nimiä.
+Teksti: {scraped_text}
 ```
 
 **Output**: 
-- Dictionary: `{yritys_url: [asiakas1, asiakas2, ...]}`
-- Yhteensä n. 20-100 asiakasta (riippuu löydöksistä)
-
-**Virheenkäsittely**:
-- Jos sivustoa ei saada haettua → jatka muilla
-- Jos ei löydy asiakassivuja → merkitse "Ei julkisia referenssejä"
+```python
+{
+  "Reaktor": ["Elisa", "YLE", "Kesko"],
+  "Futurice": ["HSL", "Kela", "Alko"],
+  ...
+}
+```
 
 ---
 
-## Vaihe 4: Asiakassegmentointi
+## Vaihe 4: ICP-analyysi (Ideal Customer Profile)
 
-**Input**: Kaikki löydetyt asiakasnimet (yhteensä kaikilta 6 yritykseltä)
+**API**: GPT-5 Responses API
+
+**Input**: Kaikki asiakkaat kaikilta yrityksiltä
 
 **Prosessi**:
-1. Yhdistä kaikki asiakasnimet yhdeksi listaksi
-2. Lähetä OpenAI:lle segmentointianalyysi
-3. OpenAI tunnistaa yhteisiä piirteitä ja luo segmentit
+1. Yhdistä kaikki asiakkaat (50-150 yritystä)
+2. Lähetä GPT-5:lle ICP-analyysiin
+3. Luo 4-6 ICP:tä
 
-**OpenAI Prompt**:
-```
-Analysoi seuraava lista B2B-asiakkaita ja luo niistä loogisia asiakassegmenttejä.
+**ICP-ulottuvuudet**:
+- **Firmografia**: Koko, toimialat, organisaatiotyyppi
+- **Teknografia**: Digitaalinen kypsyys, tech stack
+- **Tarpeet**: Haasteet, tyypilliset projektit
+- **Käyttäytyminen**: Päätöksenteko, budjetti
 
-Asiakasnimet:
-{kaikki_asiakkaat}
-
-Tee seuraavaa:
-1. Tunnista yhteiset toimialat/teollisuudenalat
-2. Tunnista yrityskokojen jakauma (pk-yritykset, suuryritykset)
-3. Tunnista maantieteelliset keskittymät
-4. Luo 4-6 selkeää asiakassegmenttiä
-
-Palauta JSON-muodossa:
+**Output**:
+```json
 {
-  "segments": [
+  "icps": [
     {
-      "name": "Segmentin nimi",
-      "description": "Lyhyt kuvaus",
-      "examples": ["Esimerkki 1", "Esimerkki 2"]
+      "name": "Suuret finanssialan toimijat",
+      "firmographic": {
+        "company_size": "Enterprise",
+        "industries": ["Banking", "Insurance"]
+      },
+      "needs": {
+        "challenges": ["Compliance", "Legacy"],
+        "typical_projects": ["Digital platforms"]
+      },
+      "example_customers": ["OP", "Nordea"],
+      "market_value": "High"
     }
   ]
 }
 ```
 
-**Output**: 
-- 4-6 asiakassegmenttiä
-- Jokainen segmentti sisältää nimen, kuvauksen ja esimerkkejä
-
 ---
 
 ## Vaihe 5: Etusivujen copyjen haku
 
-**Input**: 6 yrityksen URL:it
+**Teknologia**: BeautifulSoup4 (EI OpenAI:ta)
 
-**Prosessi (kullekin yritykselle)**:
-1. Hae yrityksen etusivu
-2. Käytä BeautifulSoup4 tekstin erottamiseen
-3. Erottele tärkeät tekstiosuudet:
-   - Hero-tekstit (pääotsikot)
-   - Value propositionit
-   - Kuvaukset palveluista/tuotteista
-4. Poista navigaatio, footer jne.
+**Prosessi (per yritys)**:
+1. Scrappaa etusivu
+2. Poimi:
+   - H1, H2 otsikot
+   - Hero-tekstit
+   - Ensimmäiset kappaleet
+3. Puhdista (poista nav, footer, script)
 
 **Output**:
-- Dictionary: `{yritys_url: "Etusivun päätekstit..."}`
-- Keskimäärin 200-500 sanaa per yritys
-
-**Tekninen toteutus**:
 ```python
-def extract_homepage_copy(url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
-    
-    # Poista turha
-    for element in soup(['script', 'style', 'nav', 'footer']):
-        element.decompose()
-    
-    # Etsi tärkeät tekstit
-    hero = soup.find(['h1', 'h2'])
-    paragraphs = soup.find_all('p', limit=10)
-    
-    return combined_text
-```
-
----
-
-## Vaihe 6: Positioning-analyysi
-
-**Input**: 
-- 6 yritystä
-- 4-6 segmenttiä
-- Etusivujen copyt
-
-**Prosessi**:
-1. Lähetä kaikki data OpenAI:lle
-2. OpenAI analysoi kunkin yrityksen viestin vahvuuden per segmentti
-3. Pisteytetään asteikolla 1-5
-
-**OpenAI Prompt**:
-```
-Analysoi seuraavien yritysten positioning eri asiakassegmenteille.
-
-YRITYKSET JA NIIDEN VIESTIT:
-{yritykset_ja_copyt}
-
-ASIAKASSEGMENTIT:
-{segmentit}
-
-TEHTÄVÄ:
-Arvioi kunkin yrityksen viestin (etusivun copy) vahvuus kullekin segmentille.
-
-Kriteerit:
-- Kuinka hyvin viesti resonoi segmentin tarpeiden kanssa?
-- Mainitaanko segmentti eksplisiittisesti?
-- Onko esimerkkejä/referenssejä segmentistä?
-- Onko tarjonta relevanttia segmentille?
-
-Palauta JSON:
 {
-  "analysis": [
-    {
-      "company": "Yritys A",
-      "url": "...",
-      "segments": {
-        "Segmentti 1": {
-          "score": 4,
-          "reasoning": "Vahva fokus tähän segmenttiin..."
-        },
-        "Segmentti 2": { ... }
-      }
-    }
-  ],
-  "segment_leaders": {
-    "Segmentti 1": "Yritys A",
-    "Segmentti 2": "Yritys C"
+  "Reaktor": {
+    "hero_headline": "We create digital products",
+    "main_value_prop": "Transform your business...",
+    "full_text": "..."
   }
 }
 ```
 
+---
+
+## Vaihe 6: Positioning-analyysi (YDIN)
+
+**API**: GPT-5 Responses API
+
+**Input**:
+- 6 yrityksen copyt (vaihe 5)
+- 4-6 ICP:tä (vaihe 4)
+
+**Prosessi**:
+1. Arvioi kunkin yrityksen viesti per ICP
+2. Anna pisteet 1-5
+3. Perustele vahvuudet ja heikkoudet
+
+**Kriteerit**:
+- Mainitaanko ICP:n toimialoja?
+- Puhutaanko ICP:n haasteista?
+- Onko case-esimerkkejä?
+- Onko viesti linjassa digitaalisen kypsyyden kanssa?
+
 **Output**:
-- Matriisi: Yritykset × Segmentit, pisteet 1-5
-- Selitykset jokaiselle pisteytykselle
-- Yhteenveto: Kuka on vahvin kussakin segmentissä
+```json
+{
+  "analysis": [
+    {
+      "company": "Reaktor",
+      "positioning_by_icp": [
+        {
+          "icp_name": "Suuret finanssialan toimijat",
+          "score": 4,
+          "reasoning": "Vahva fokus...",
+          "strengths": ["S1", "S2"],
+          "weaknesses": ["W1"]
+        }
+      ]
+    }
+  ],
+  "icp_leaders": {
+    "Suuret finanssialan toimijat": "Reaktor"
+  },
+  "overall_insights": "Keskeiset löydökset..."
+}
+```
 
 ---
 
 ## Vaihe 7: HTML-raportin generointi
 
-**Input**: Kaikki edellisten vaiheiden data
+**Teknologia**: Python string templating + MEOM style guide
 
 **Prosessi**:
-1. Lataa HTML-template
-2. Täytä template datalla
-3. Luo visualisoinnit (taulukot, matriisit)
-4. Tallenna HTML-tiedosto
+1. Lataa MEOM:n tyylit (CSS)
+2. Generoi HTML:
+   - Executive summary
+   - ICP-johtajat (kortit)
+   - Positioning-matriisi (taulukko, värikoodattu)
+   - Yrityskohtaiset analyysit
+   - ICP-profiilit
+3. Tallenna tiedostoon
 
-**Raportin rakenne**:
-
-```html
-1. EXECUTIVE SUMMARY
-   - Analysoidut yritykset
-   - Päälöydökset
-
-2. KILPAILIJA-YLEISKATSAUS
-   - Taulukko 6 yrityksestä
-   - Perustiedot ja URL:t
-
-3. ASIAKASSEGMENTIT
-   - 4-6 tunnistettua segmenttiä
-   - Kuvaukset ja esimerkit
-
-4. POSITIONING-MATRIISI
-   - Taulukko: Yritykset × Segmentit
-   - Värikoodaus vahvuuden mukaan
-   - Heat map -tyylinen visualisointi
-
-5. SEGMENTTIKOHTAINEN ANALYYSI
-   Per segmentti:
-   - Vahvin toimija
-   - Perustelu
-   - Muiden yritysten positioning
-
-6. YRITYSKOHTAINEN ANALYYSI
-   Per yritys:
-   - Etusivun pääviesit
-   - Asiakasreferenssit
-   - Vahvuudet ja heikkoudet
-   - Suositukset
-
-7. LIITTEET
-   - Kaikki löydetyt asiakasreferenssit
-   - Raa'at pisteet
-```
-
-**Output**: 
-- Valmis HTML-tiedosto
-- Avattavissa selaimessa
-- Tulostettavissa/jaettavissa PDF:nä
+**Output**: `report.html` (valmis avattavaksi selaimessa)
 
 ---
 
-## Tekninen workflow-kaavio
+## Tekninen kaavio
 
 ```
-┌─────────────────┐
-│  python         │
-│  analyzer.py    │
-│  --url X        │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────────────┐
-│ 1. Validoi URL                  │
-└────────┬────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────┐
-│ 2. Hae kilpailijat (OpenAI)     │
-│    → 5 yritystä                 │
-└────────┬────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────┐
-│ 3. Loop 6 yritystä:             │
-│    - Scrape asiakassivut        │
-│    - OpenAI: pura asiakasnimet  │
-└────────┬────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────┐
-│ 4. Segmentoi asiakkaat (OpenAI) │
-│    → 4-6 segmenttiä             │
-└────────┬────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────┐
-│ 5. Loop 6 yritystä:             │
-│    - Scrape etusivu             │
-│    - Tallenna copyt             │
-└────────┬────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────┐
-│ 6. Analysoi positioning         │
-│    (OpenAI)                     │
-│    → Matriisi + selitykset      │
-└────────┬────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────┐
-│ 7. Generoi HTML-raportti        │
-└────────┬────────────────────────┘
-         │
-         ▼
-┌─────────────────┐
-│  report.html    │
-└─────────────────┘
+analyzer.py --url X
+    │
+    ├─→ [1A] analyze_target_company()      GPT-5
+    │
+    ├─→ [1B] find_competitors()            GPT-5 + Web Search
+    │
+    ├─→ [3]  extract_all_customers()       BeautifulSoup + GPT-5
+    │        └─→ per company:
+    │            ├─ find_customer_pages()
+    │            ├─ scrape_page_text()
+    │            └─ extract_customer_names()  GPT-5
+    │
+    ├─→ [4]  create_icps()                 GPT-5
+    │
+    ├─→ [5]  extract_all_copy()            BeautifulSoup
+    │
+    ├─→ [6]  analyze_positioning()         GPT-5
+    │
+    └─→ [7]  generate_html_report()        Template
+            └─→ report.html
 ```
 
-## Arvioitu suoritusaika
+---
 
-- Vaihe 1: < 1 s
-- Vaihe 2: 5-10 s (OpenAI + web search)
-- Vaihe 3: 30-60 s (6× scraping + OpenAI)
-- Vaihe 4: 5-10 s (OpenAI)
-- Vaihe 5: 10-20 s (6× scraping)
-- Vaihe 6: 10-20 s (OpenAI)
-- Vaihe 7: 1-2 s
+## API-käyttö yhteenveto
 
-**Yhteensä**: 1-2 minuuttia per analyysi
+| Vaihe | API | Web Search | Kesto |
+|-------|-----|-----------|--------|
+| 1A | GPT-5 Responses | - | 10-20s |
+| 1B | GPT-5 Responses | ✓ | 20-40s |
+| 3 | GPT-5 Responses | - | 2-4 min |
+| 4 | GPT-5 Responses | - | 20-40s |
+| 5 | - | - | 30-60s |
+| 6 | GPT-5 Responses | - | 30-60s |
+| 7 | - | - | 1s |
+
+**Yhteensä**: 10-15 min (6 yritystä)
+
+---
 
 ## Virheenkäsittely
 
-Työkalu käsittelee seuraavat virhetilanteet:
-- URL ei ole tavoitettavissa → Ilmoita ja keskeytä
-- Kilpailijoita ei löydy → Jatka pelkällä alkuperäisellä
+- URL ei toimi → Keskeytä
+- Kilpailijoita ei löydy → Jatka vain kohdeyrityksellä
 - Asiakassivuja ei löydy → Merkitse "Ei julkisia referenssejä"
-- OpenAI API-virhe → Yritä uudelleen 3× exponential backoff
-- Rate limiting → Odota ja yritä uudelleen
-
+- Scraping epäonnistuu → Jatka muilla
+- OpenAI timeout → Retry 3× exponential backoff
+- JSON-parsinta epäonnistuu → Logita raakadata, keskeytä

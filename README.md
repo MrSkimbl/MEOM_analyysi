@@ -1,198 +1,182 @@
-# Kilpailija-analyysi-työkalu
+# MEOM Competitor Analysis Tool
 
-Python-pohjainen komentorivityökalu, joka analysoi yrityksen ja sen kilpailijoiden positioning-vahvuudet eri asiakassegmenteissä hyödyntäen OpenAI:n API:a ja web search -toimintoa.
+Python-komentorivityökalu joka analysoi yrityksen kilpailuaseman Suomen markkinassa ja tuottaa HTML-raportin.
 
-## Ominaisuudet
+## 🚀 Pikakäynnistys
 
-🔍 **Automaattinen kilpailija-analyysi**
-- Hakee 5 kilpailijaa Suomen markkinassa
-- Kerää asiakasreferenssit kaikkien yritysten sivustoilta
-- Segmentoi asiakkaat automaattisesti
-- Analysoi positioning-vahvuudet per segmentti
-- Tuottaa selkeän HTML-raportin
+```bash
+# 1. Asenna riippuvuudet
+pip install -r requirements.txt
 
-## Projektin rakenne
+# 2. Konfiguroi OpenAI API-avain
+echo "OPEN_AI_API=sk-your-key-here" > .env
+
+# 3. Aja analyysi
+python analyzer.py --url https://yritys.fi --competitors 5
+```
+
+## 📊 Mitä työkalu tekee?
+
+Analysoi kohdeyrityksen ja sen kilpailijat 7 vaiheessa:
+
+1. **Yritysanalyysi** - Analysoi kohdeyrityksen palvelut ja asiakaskunta
+2. **Kilpailijahaku** - Löytää 5 kilpailijaa Suomen markkinasta (Web Search)
+3. **Asiakasreferenssit** - Kerää asiakasnimet kaikista 6 yrityksestä
+4. **ICP-analyysi** - Luo 4-6 Ideal Customer Profilea
+5. **Etusivujen copyt** - Scrappaa yritysten viestit
+6. **Positioning-analyysi** - Arvioi vahvuudet per ICP (pisteet 1-5)
+7. **HTML-raportti** - Generoi ammattimainen raportti
+
+**Kesto**: 10-15 min (6 yritystä) | 5-8 min (2 yritystä)
+
+## 📁 Projektin rakenne
 
 ```
 .
-├── docs/                    # Dokumentaatio
-│   ├── project-plan.md     # Projektisuunnitelma
-│   ├── workflow.md         # Yksityiskohtainen workflow
-│   ├── openai-api-reference.md  # OpenAI API-dokumentaatio
-│   └── testing-guide.md    # Testausohje
-├── test/                   # Testit
-│   ├── test_openai_api.py  # OpenAI API-testit
-│   └── README.md           # Testausdokumentaatio
-├── templates/              # HTML-raporttipohjat (tulossa)
-├── .env                    # API-avaimet (ei versionhallinnassa)
-├── .gitignore             # Git-ignoret
-├── requirements.txt       # Python-riippuvuudet
-├── analyzer.py            # Pääskripti (tulossa)
-└── README.md              # Tämä tiedosto
+├── src/                        # Lähdekoodit
+│   ├── competitor_finder.py    # Vaiheet 1-2
+│   ├── customer_extractor.py   # Vaihe 3
+│   ├── segmentation.py         # Vaihe 4
+│   ├── copy_extractor.py       # Vaihe 5
+│   ├── positioning.py          # Vaihe 6
+│   └── report_generator.py     # Vaihe 7
+├── docs/                       # Dokumentaatio
+│   ├── README.md               # Dokumentaatio-indeksi
+│   ├── project-plan.md         # Projektisuunnitelma
+│   ├── workflow.md             # Yksityiskohtainen workflow
+│   ├── openai-api-reference.md # OpenAI API-ohjeet
+│   └── style-guide.md          # HTML-tyyliopas
+├── test/
+│   └── test_openai_api.py      # API-testit
+├── analyzer.py                 # PÄÄSKRIPTI
+├── requirements.txt
+└── .env                        # API-avain (älä commitoi!)
 ```
 
-## Asennus
+## 🔧 Käyttö
 
-### 1. Kloonaa repositorio
+### Peruskomento
 
 ```bash
-git clone <repo-url>
-cd "MEOM, analyysi"
-```
-
-### 2. Asenna riippuvuudet
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Konfiguroi OpenAI API-avain
-
-Luo `.env`-tiedosto projektin juureen:
-
-```
-OPENAI_API_KEY=your-api-key-here
-```
-
-Hanki API-avain: https://platform.openai.com/api-keys
-
-### 4. Testaa asennus
-
-```bash
-python test/test_openai_api.py
-```
-
-Jos kaikki 4 testiä läpäistään, asennus on valmis! ✅
-
-## Käyttö (tulossa)
-
-```bash
-python analyzer.py --url https://example.com --output report.html
+python analyzer.py --url https://yritys.fi
 ```
 
 ### Parametrit
 
-- `--url`: Analysoitavan yrityksen URL (pakollinen)
-- `--output`: HTML-raportin tiedostonimi (oletus: `report.html`)
-- `--competitors`: Kilpailijoiden määrä (oletus: 5)
+| Parametri | Kuvaus | Oletus |
+|-----------|--------|--------|
+| `--url` | Kohdeyrityksen URL (pakollinen) | - |
+| `--competitors` | Kilpailijoiden määrä | 5 |
+| `--output` | Raportin tiedostonimi | report.html |
+| `--step` | Aja vain tietty vaihe (testaus) | Kaikki |
 
-## Workflow
-
-Työkalu suorittaa analyysin 7 vaiheessa:
-
-1. **URL-validointi** - Tarkistaa että sivusto on tavoitettavissa
-2. **Kilpailijoiden haku** - OpenAI web search löytää 5 kilpailijaa
-3. **Asiakasreferenssien haku** - Kerää asiakkaiden nimet kaikkien sivustoilta
-4. **Segmentointi** - OpenAI luo 4-6 asiakassegmenttiä
-5. **Etusivujen copyt** - Hakee ja purkuu etusivujen päätekstit
-6. **Positioning-analyysi** - Analysoi vahvuudet per segmentti (1-5 pistettä)
-7. **HTML-raportti** - Generoi visuaalisen raportin
-
-**Arvioitu suoritusaika**: 1-2 minuuttia per analyysi
-
-Katso yksityiskohtainen kuvaus: [docs/workflow.md](docs/workflow.md)
-
-## Dokumentaatio
-
-- **[Project Plan](docs/project-plan.md)** - Korkean tason suunnitelma
-- **[Workflow](docs/workflow.md)** - Yksityiskohtainen 7-vaiheinen prosessi
-- **[OpenAI API Reference](docs/openai-api-reference.md)** - Ajantasainen API-dokumentaatio (2025)
-- **[Testing Guide](docs/testing-guide.md)** - Testausohje ja tulokset
-
-## Teknologiat
-
-- **Python 3.12+** - Pääkieli
-- **OpenAI API** - AI-analyysi ja web search
-  - `gpt-4o` - JSON-outputit ja yleinen käyttö
-  - `gpt-5-search-api` - Web search -toiminnot (tulossa)
-- **BeautifulSoup4** - Web scraping
-- **Requests** - HTTP-pyynnöt
-- **python-dotenv** - Ympäristömuuttujat
-
-## Testaus
-
-### OpenAI API-testit
+### Esimerkkejä
 
 ```bash
-python test/test_openai_api.py
+# Täysi analyysi (6 yritystä)
+python analyzer.py --url https://reaktor.com --competitors 5
+
+# Nopea testi (2 yritystä)
+python analyzer.py --url https://meom.fi --competitors 1
+
+# Määritä output-tiedosto
+python analyzer.py --url https://meom.fi --output meom-analyysi.html
+
+# Testaa vain kilpailijahaku
+python analyzer.py --url https://meom.fi --step 1
+
+# Testaa ICP-analyysi
+python analyzer.py --url https://meom.fi --competitors 1 --step 4
 ```
 
-**Testitulokset (Lokakuu 17, 2025)**:
-- ✅ API-yhteys toimii
-- ✅ Web Search toimii
-- ✅ JSON-output toimii
-- ✅ Kilpailijahaku-simulaatio toimii
+## 📦 Riippuvuudet
 
-**Yhteensä**: 4/4 testiä läpäistiin onnistuneesti
+```
+openai>=1.54.0        # GPT-5 Responses API + Web Search
+beautifulsoup4        # Web scraping
+requests              # HTTP-pyynnöt
+python-dotenv         # Env-muuttujat
+```
 
-Katso: [docs/testing-guide.md](docs/testing-guide.md)
+## 🔑 API-avain
 
-## Kustannukset
+Tarvitset OpenAI API-avaimen jolla on pääsy:
+- GPT-5 malleihin
+- Web Search -toimintoon
 
-Arvioitu OpenAI API-kustannus:
-- **Per analyysi**: ~25,000 tokenia
-- **Kustannus**: ~$0.10-0.25 per analyysi (riippuu mallista)
+Lisää avain `.env`-tiedostoon:
+```
+OPEN_AI_API=sk-your-key-here
+```
 
-Tokenien käyttö per vaihe:
-- Kilpailijahaku: ~2,000 tokenia
-- Asiakasreferenssit (6×): ~15,000 tokenia
-- Segmentointi: ~3,000 tokenia
-- Positioning: ~5,000 tokenia
+## 📈 Output (HTML-raportti)
 
-## Kehitystila
+Raportti sisältää:
+- ✅ **Executive Summary** - Keskeiset oivallukset
+- ✅ **ICP Leaders** - Vahvimmat toimijat per ICP
+- ✅ **Positioning-matriisi** - Pisteet 1-5 (värikoodattu)
+- ✅ **Yrityskohtaiset analyysit** - Vahvuudet ja heikkoudet
+- ✅ **ICP-profiilit** - Yksityiskohtaiset asiakasprofiilit
 
-### ✅ Valmis
+**Tyyli**: MEOM brand (ks. `docs/style-guide.md`)
 
-- [x] Projektin suunnittelu
-- [x] Dokumentaatio
-- [x] OpenAI API-integraatio ja testit
-- [x] Test-kansion rakenne
+## 🧪 Testaus
 
-### 🚧 Kehityksessä
+```bash
+# Testaa OpenAI API -yhteys
+cd test
+python test_openai_api.py
 
-- [ ] analyzer.py pääskripti
-- [ ] Web scraping -toiminnallisuus
-- [ ] HTML-raporttipohja
-- [ ] End-to-end testit
+# Testaa vain kilpailijahaku (nopea)
+python analyzer.py --url https://reaktor.com --step 1
+```
 
-### 📋 Suunniteltu
+## 💰 Kustannukset
 
-- [ ] CLI-parannukset (progress bar, verbose mode)
+Täysi analyysi (6 yritystä) käyttää:
+- ~10-18 GPT-5 API-kutsua
+- ~1-2 Web Search -toimintoa
+
+Arvioitu hinta: $1-3 per analyysi (riippuen GPT-5 hinnoittelusta)
+
+## 🐛 Yleisiä ongelmia
+
+### "ModuleNotFoundError: No module named 'openai'"
+```bash
+pip install -r requirements.txt
+```
+
+### "OpenAI API-avain puuttuu!"
+```bash
+echo "OPEN_AI_API=sk-..." > .env
+```
+
+### "UnicodeEncodeError" (Windows)
+Työkalu käsittelee tämän automaattisesti. Jos ongelmia, aja PowerShellissä:
+```bash
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+```
+
+## 📚 Dokumentaatio
+
+Katso `/docs` kansio:
+- **project-plan.md** - Projektin rakenne ja tavoitteet
+- **workflow.md** - Yksityiskohtainen 7-vaiheinen kuvaus
+- **openai-api-reference.md** - OpenAI API käyttö
+- **style-guide.md** - HTML-raportin tyyliopas
+
+## 🛠️ Kehitysideat
+
+- [ ] JSON-välidata (jatka keskeytyneestä)
 - [ ] PDF-export
-- [ ] Batch-analyysi (useita URLeja kerralla)
-- [ ] API-rate limiting
-- [ ] Caching
+- [ ] Kielivalinta (EN/FI)
+- [ ] LinkedIn-integraatio
+- [ ] Syvempi teknografia-analyysi
 
-## Turvallisuus
+## 📄 Lisenssi
 
-⚠️ **Tärkeää**:
-- Älä koskaan commitoi `.env`-tiedostoa
-- API-avain on henkilökohtainen - älä jaa sitä
-- `.env` on lisätty `.gitignore`-tiedostoon
+MEOM internal tool
 
-## Lisenssit
+## 🤝 Tekijä
 
-- OpenAI API: [OpenAI Terms of Use](https://openai.com/terms)
-- Projekti: (Määritä tarvittaessa)
-
-## Tuki ja palaute
-
-Ongelmissa tai kysymyksissä:
-1. Tarkista [docs/testing-guide.md](docs/testing-guide.md)
-2. Aja testit: `python test/test_openai_api.py`
-3. Tarkista [OpenAI Status](https://status.openai.com/)
-
-## Versiohistoria
-
-### v0.1.0 (Lokakuu 17, 2025)
-- Projektin perustus
-- Dokumentaatio luotu
-- OpenAI API-testit toiminnassa
-- Test-infrastruktuuri valmis
-
----
-
-**Tila**: 🚧 Aktiivinen kehitys  
-**Päivitetty**: Lokakuu 17, 2025  
-**Python-versio**: 3.12+
-
+MEOM - B2B-verkkosivut ja digitaalinen kehitys

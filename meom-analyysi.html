@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kilpailija-analyysi: MEOM</title>
+    <style>
+
+:root {
+  --ink: #221f1f;
+  --bg: #ffffff;
+  --muted-ink: #4a4a4a;
+  --divider: #e9e9eb;
+  --accent: #00C389;
+  --accent-ink: #ffffff;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Inter", "Helvetica Neue", Arial, sans-serif;
+  --h1: clamp(2.2rem, 3.2vw, 3.5rem);
+  --h2: clamp(1.6rem, 2.4vw, 2.25rem);
+  --h3: clamp(1.25rem, 1.6vw, 1.5rem);
+  --body: 1rem;
+  --lead: 1.125rem;
+  --lh-tight: 1.15;
+  --lh-normal: 1.6;
+  --s0: 8px; --s1: 12px; --s2: 16px; --s3: 24px;
+  --s4: 32px; --s5: 48px; --s6: 64px; --s7: 96px;
+  --radius: 14px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 6px 16px rgba(0,0,0,.08);
+}
+
+html, body { margin:0; padding:0; background:var(--bg); color:var(--ink); font-family:var(--font-sans); font-size:16px; }
+.container { width:100%; max-width:1280px; margin:0 auto; padding-left:24px; padding-right:24px; }
+h1 { font-size:var(--h1); line-height:var(--lh-tight); font-weight:700; margin:0 0 var(--s3); }
+h2 { font-size:var(--h2); line-height:1.2; font-weight:700; margin:0 0 var(--s2); }
+h3 { font-size:var(--h3); line-height:1.25; font-weight:600; margin:0 0 var(--s2); }
+p { font-size:var(--body); line-height:var(--lh-normal); color:var(--muted-ink); margin:0 0 var(--s2); }
+.lead { font-size:var(--lead); line-height:var(--lh-normal); max-width:68ch; color:var(--ink); }
+hr { border:0; height:1px; background:var(--divider); margin:var(--s4) 0; }
+
+.site-header { position:sticky; top:0; z-index:50; background:rgba(255,255,255,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--divider); }
+.nav { height:68px; display:flex; align-items:center; justify-content:space-between; }
+.logo { font-weight:700; letter-spacing:.2px; }
+
+.card { background:#fff; border:1px solid var(--divider); border-radius:var(--radius); box-shadow:var(--shadow-sm); padding:var(--s4); }
+.card h3 { margin-bottom:var(--s2); }
+.card__meta { font-size:.9rem; color:var(--muted-ink); margin-bottom: var(--s2); }
+
+.section { padding:var(--s6) 0; }
+.section--tight { padding:var(--s4) 0; }
+.hero { padding:var(--s7) 0 var(--s6); }
+
+.grid { display:grid; gap:var(--s3); }
+@media (min-width:768px) { 
+  .grid--2 { grid-template-columns:repeat(2,1fr); } 
+  .grid--3 { grid-template-columns:repeat(3,1fr); }
+}
+
+.badge { display:inline-block; padding:6px 12px; font-size:.85rem; border-radius:999px; background:var(--divider); color:var(--ink); margin-right:8px; margin-bottom:8px; }
+.badge--accent { background:var(--accent); color:var(--accent-ink); }
+
+.table { width:100%; border-collapse:separate; border-spacing:0; margin:var(--s3) 0; }
+.table th, .table td { padding:12px 14px; border-bottom:1px solid var(--divider); text-align:left; }
+.table th { font-weight:600; color:var(--ink); background:#f9fafb; }
+.table td { color:var(--ink); }
+
+.score { display:inline-block; padding:4px 10px; border-radius:6px; font-weight:600; font-size:0.9rem; }
+.score--5 { background:#00C389; color:#fff; }
+.score--4 { background:#4ade80; color:#fff; }
+.score--3 { background:#fbbf24; color:#000; }
+.score--2 { background:#fb923c; color:#fff; }
+.score--1 { background:#ef4444; color:#fff; }
+
+.site-footer { margin-top:var(--s7); padding:var(--s5) 0; border-top:1px solid var(--divider); background:#f9fafb; }
+
+ul.list { list-style: none; padding:0; margin:0; }
+ul.list li { padding:4px 0; color:var(--muted-ink); }
+ul.list li:before { content:"•"; color:var(--accent); margin-right:8px; }
+
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container nav">
+        <div class="logo">MEOM Analyysi</div>
+        <div style="font-size: 0.9rem; color: var(--muted-ink);">17.10.2025 17:09</div>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="container">
+        <h1>Kilpailija-analyysi</h1>
+        <p class="lead">Positioning-analyysi: MEOM ja 3 kilpailijaa Suomen markkinassa</p>
+    </div>
+</section>
+
+<!-- EXECUTIVE SUMMARY -->
+<section class="section">
+    <div class="container">
+        <h2>Keskeiset oivallukset</h2>
+        <div class="card">
+            <p>Valve viestii vahvimmin enterprise-B2B:lle ja kasvuyrityksille, erityisesti teollisuudelle ja asiantuntijapalveluille, kiitos ostokokemusten ja myynti–markkinointi-yhdistelmän korostuksen sekä case-viitteiden. Evermade resonoi parhaiten kuluttajavetoisiin ja julkisen kaltaisiin yleisiin digitaalitarpeisiin laajan web–app–ecommerce-tarjoaman ja markkinoinnin omistettavuuden ansiosta. MEOM on vahva B2B-sivustojen konversio- ja ROI-kärjessä (hyvä SaaS- ja asiantuntijasegmenteille), mutta toimialaspesifien vaatimusten (saavutettavuus, sääntely, portaalit) konkretia puuttuu; Avidlyn nykyinen etusivukopio on liian yleinen erottautuakseen ICP-tasolla.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ICP LEADERS -->
+<section class="section section--tight">
+    <div class="container">
+        <h2>Vahvimmat toimijat per ICP</h2>
+        <div class="grid grid--2">
+
+            <div class="card">
+                <div class="card__meta">ICP</div>
+                <h3>Teolliset valmistajat ja insinööritalot (B2B vientivetoinen teollisuus)</h3>
+                <p><strong style="color:var(--accent);">Vahvin: Valve Branding Oy</strong></p>
+            </div>
+            <div class="card">
+                <div class="card__meta">ICP</div>
+                <h3>SaaS- ja ohjelmistoalustat (scaleup–enterprise)</h3>
+                <p><strong style="color:var(--accent);">Vahvin: Valve Branding Oy</strong></p>
+            </div>
+            <div class="card">
+                <div class="card__meta">ICP</div>
+                <h3>Julkinen sektori, liitot ja järjestöt</h3>
+                <p><strong style="color:var(--accent);">Vahvin: Evermade Oy</strong></p>
+            </div>
+            <div class="card">
+                <div class="card__meta">ICP</div>
+                <h3>Kuluttajapalvelut, matkailu & tapahtumabrändit</h3>
+                <p><strong style="color:var(--accent);">Vahvin: Evermade Oy</strong></p>
+            </div>
+            <div class="card">
+                <div class="card__meta">ICP</div>
+                <h3>Ammattilais- ja asiantuntijapalvelut (toimistot, konsultointi, design)</h3>
+                <p><strong style="color:var(--accent);">Vahvin: Valve Branding Oy</strong></p>
+            </div>
+            <div class="card">
+                <div class="card__meta">ICP</div>
+                <h3>Energia, infra ja rakentamisen operaattorit</h3>
+                <p><strong style="color:var(--accent);">Vahvin: Valve Branding Oy</strong></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- POSITIONING MATRIX -->
+<section class="section" style="background:#f9fafb; padding: var(--s6) 0;">
+    <div class="container">
+        <h2>Positioning-matriisi</h2>
+        <p class="lead">Pisteet 1-5: Kuinka hyvin kunkin yrityksen viesti resonoi eri ICP:iden kanssa</p>
+        <div style="overflow-x: auto; margin-top: var(--s4);">
+<table class="table">
+<thead><tr><th>Yritys</th><th>Teolliset valmistajat ja insinööritalot (B2B vientivetoinen teollisuus)</th><th>SaaS- ja ohjelmistoalustat (scaleup–enterprise)</th><th>Julkinen sektori, liitot ja järjestöt</th><th>Kuluttajapalvelut, matkailu & tapahtumabrändit</th><th>Ammattilais- ja asiantuntijapalvelut (toimistot, konsultointi, design)</th><th>Energia, infra ja rakentamisen operaattorit</th></tr></thead>
+<tbody><tr><td><strong>MEOM</strong></td><td><span class="score score--3">3/5</span></td><td><span class="score score--4">4/5</span></td><td><span class="score score--2">2/5</span></td><td><span class="score score--2">2/5</span></td><td><span class="score score--4">4/5</span></td><td><span class="score score--2">2/5</span></td></tr><tr><td><strong>Evermade Oy</strong></td><td><span class="score score--3">3/5</span></td><td><span class="score score--4">4/5</span></td><td><span class="score score--3">3/5</span></td><td><span class="score score--4">4/5</span></td><td><span class="score score--4">4/5</span></td><td><span class="score score--2">2/5</span></td></tr><tr><td><strong>Valve Branding Oy</strong></td><td><span class="score score--4">4/5</span></td><td><span class="score score--4">4/5</span></td><td><span class="score score--2">2/5</span></td><td><span class="score score--1">1/5</span></td><td><span class="score score--4">4/5</span></td><td><span class="score score--3">3/5</span></td></tr><tr><td><strong>Avidly</strong></td><td><span class="score score--2">2/5</span></td><td><span class="score score--3">3/5</span></td><td><span class="score score--1">1/5</span></td><td><span class="score score--2">2/5</span></td><td><span class="score score--3">3/5</span></td><td><span class="score score--1">1/5</span></td></tr></tbody></table>
+        </div>
+    </div>
+</section>
+
+<!-- YRITYSKOHTAINEN ANALYYSI -->
+<section class="section">
+    <div class="container">
+        <h2>Yrityskohtainen analyysi</h2>
+
+        <div class="card" style="margin-bottom:var(--s4);">
+            <h3>MEOM</h3>
+            <div class="card__meta">47 asiakasta tunnistettu</div>
+            
+            <h4 style="margin-top:var(--s3); margin-bottom:var(--s2); font-size:1rem;">Positioning per ICP:</h4>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Teolliset valmistajat ja insinööritalot (B2B vientivetoinen teollisuus)</strong>
+                    <span class="score score--3">3/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Viestissä korostetaan B2B-verkkosivustoja, strategiaa ja konversiota, jotka ovat teollisuuden myynnin tukena. Kuitenkin monimutkaiset tuotekonfiguraattorit, jälleenmyyjäportaalit ja globaalit tarpeet eivät näy eksplisiittisesti.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Selkeä B2B-fokus, konversio ja ROI-lupaus, Strategia + HubSpot/WordPress -osaaminen, Jatkuva kehitys ja performanssin seuranta</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei mainintaa tuotekonfiguraattoreista, jälleenmyyjäverkostoista tai huoltoportaaleista, Ei teollisuusesimerkkejä etusivulla</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>SaaS- ja ohjelmistoalustat (scaleup–enterprise)</strong>
+                    <span class="score score--4">4/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Konversio-optimointi, data/analytiikka ja HubSpot sopivat SaaS-viestintään ja kysynnän generointiin. PLG/self-serve ja lokalisointi eivät näy eksplisiittisesti, mutta suorituskykyyn ja jatkuvaan kehitykseen painottuminen on linjassa tarpeiden kanssa.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> CRO, analytiikka ja AI-käytännöt, Markkinointi- ja myyntifokuksen yhdistävä sisältö, Nopea liiketoimintavaikutus ja jatkuva optimointi</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei suoraa mainintaa PLG:stä, lokalisoinnista tai self-serve-poluista, Ei SaaS-caseja etusivulla</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Julkinen sektori, liitot ja järjestöt</strong>
+                    <span class="score score--2">2/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Viestintä painottuu B2B-myyntiin ja konversioon, ei julkisen sektorin erityisvaatimuksiin. Hankintaprosessit, WCAG-saavutettavuus ja monikielisyys eivät näy.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> WordPress- ja analytiikkaosaaminen, Selkeä fokus selkeisiin, tavoitteellisiin sivustoihin</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei mainintaa WCAG:sta tai hankintamalleista, Ei integraatiokeskustelua asiointipalveluihin</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Kuluttajapalvelut, matkailu & tapahtumabrändit</strong>
+                    <span class="score score--2">2/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">B2B-painotus tekee viestistä kuluttajabrändeille epäsuoran. Vaikka CRO:sta on hyötyä, lipunmyynnin, kapasiteetin hallinnan ja loyaltyn erityistarpeet eivät näy.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Konversion ja mittaamisen painotus, Jatkuva kehitys ja tulosohjautuvuus</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei ecommerce-/varausprosessien tai kapasiteetin hallinnan mainintoja, Ei kuluttajabrändien caseja</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Ammattilais- ja asiantuntijapalvelut (toimistot, konsultointi, design)</strong>
+                    <span class="score score--4">4/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Puhuttelu päättäjille, liidien kasvatus ja referenssien esille tuonti istuvat ammattilaispalveluille. Työnantajabrändi ja rekrytointi eivät näy eksplisiittisesti, mutta perusliidikoneiston rakentaminen kyllä.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> B2B-ostajamielikuva ja päättäjäkohdennus, CRO + HubSpot yhdistelmä liidien generointiin, Strategian vieminen verkkoon</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> EB/recruitment-fokus puuttuu viestistä, Ei eksplisiittisiä ABM-viestejä</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Energia, infra ja rakentamisen operaattorit</strong>
+                    <span class="score score--2">2/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Tarjooma on sivustokeskeinen eikä käsittele sääntelyä, tietoturvaa tai kriittisten palveluiden viestintää. Toimialaa ei mainita eikä ole case-viitteitä.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Selkeä kehitysmalli ja mittarointi, Teknologia-agnostinen (WP/HubSpot) toteutusosaaminen</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei tietoturva-, sääntely- tai kriittisen viestinnän viittauksia, Ei integraatio-/operatiivisia ratkaisuja (esim. työmaahallinta)</div>
+            </div>
+
+        </div>
+
+        <div class="card" style="margin-bottom:var(--s4);">
+            <h3>Evermade Oy</h3>
+            <div class="card__meta">64 asiakasta tunnistettu</div>
+            
+            <h4 style="margin-top:var(--s3); margin-bottom:var(--s2); font-size:1rem;">Positioning per ICP:</h4>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Teolliset valmistajat ja insinööritalot (B2B vientivetoinen teollisuus)</strong>
+                    <span class="score score--3">3/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">One-stop-malli (web, apps, ecommerce) sopii laajoihin digitaalisiin tarpeisiin. Viesti ei kuitenkaan käsittele teollisuuden erityishaasteita kuten tuotekonfiguraattoreita tai jälleenmyyjäverkostoja.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Laaja palvelukattaus: sivustot, sovellukset, ecommerce, Markkinoijia voimaannuttava Evermade Studio, Näyttöjä kuluttajapuolelta (esim. Valio app) → teknistä kyvykkyyttä</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei B2B-teollisuuden erityistarpeiden eksplisiittisiä mainintoja, Ei enterprise-skaalan turvallisuus/integraatioviestintää</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>SaaS- ja ohjelmistoalustat (scaleup–enterprise)</strong>
+                    <span class="score score--4">4/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Sivustot, web-applikaatiot ja markkinoijien itsehallinta ovat relevantteja SaaS-kasvulle. Viestistä puuttuu kuitenkin PLG/ABM-terminologia ja lokalisoinnin painotus.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Web app -osaaminen tukee tuotteen ja markkinoinnin rajapintaa, Gutenberg-pohjainen sisällönhallinta nopeuttaa GTM:ää, Ecommerce-kyvykkyys self-serve/tilauspoluille</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei PLG/ABM-lupauksia tai caseja, Ei lokalisoinnin ja skaalauksen mainintoja</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Julkinen sektori, liitot ja järjestöt</strong>
+                    <span class="score score--3">3/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Verkkosivut ja sovellukset ovat relevantteja julkiselle sektorille. WCAG, hankintaprosessit ja integraatiot eivät kuitenkaan nouse esiin viestissä.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Laajat design & teknologiapalvelut, Työkalut markkinoinnin omistettavuuteen (Evermade Studio)</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei saavutettavuus- tai hankintaprosessimainintoja, Ei monikielisyyden tai integraatioiden korostusta</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Kuluttajapalvelut, matkailu & tapahtumabrändit</strong>
+                    <span class="score score--4">4/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Ecommerce, sovellukset ja käyttäjäkokemuksen painotus sopivat kuluttajaliiketoimintaan ja sesonkien hallintaan. Viesti ei kuitenkaan mainitse kapasiteetin hallintaa tai loyalty/CRM:ää.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Ecommerce-transformaatio-lupaus, Web/app-kokemusten suunnittelu, Valio app -case viittaa vahvaan kuluttajakokemukseen</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei kapasiteetin/varaustaseen hallinnan ratkaisuja viestissä, CRM/loyalty-kulmat puuttuvat</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Ammattilais- ja asiantuntijapalvelut (toimistot, konsultointi, design)</strong>
+                    <span class="score score--4">4/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Markkinoijien omaehtoinen sisällönhallinta ja modernit sivustot palvelevat liidinhankintaa. ABM-osaamista tai työnantajabrändiä ei tuoda esiin.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Markkinoinnin omistettava sivusto (Evermade Studio), Monikanavaiset kyvykkyydet (web, app, ecommerce), Käyttäjäkokemuksen painotus</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> ABM- ja liidiprosessien eksplisiittisyys puuttuu, EB/recruitment-viestit puuttuvat</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Energia, infra ja rakentamisen operaattorit</strong>
+                    <span class="score score--2">2/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Tekniset toteutukset ovat mahdollisia, mutta viesti ei huomioi sääntelyä, tietoturvaa tai kriittistä viestintää. Toimiala- ja case-viittaukset puuttuvat.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Web/app-osaaminen tarjoaa perustan asiointipalveluille, Käyttäjäkokemuksen optimointi</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei tietoturva-/sääntelyviestintää, Ei referenssejä tältä sektorilta</div>
+            </div>
+
+        </div>
+
+        <div class="card" style="margin-bottom:var(--s4);">
+            <h3>Valve Branding Oy</h3>
+            <div class="card__meta">26 asiakasta tunnistettu</div>
+            
+            <h4 style="margin-top:var(--s3); margin-bottom:var(--s2); font-size:1rem;">Positioning per ICP:</h4>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Teolliset valmistajat ja insinööritalot (B2B vientivetoinen teollisuus)</strong>
+                    <span class="score score--4">4/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Selkeä B2B-ostokokemusten ja kaupallisen kokemuksen digitalisoinnin fokus, enterprise-palvelumalli ja case-viittaukset (esim. Gebwell, Nokia) tukevat teollisuutta. Monimutkaisten portaalien ja konfiguraattorien eksplisiittinen maininta puuttuu.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> B2B enterprise -painotus ja skaala, Kasvumarkkinointi ja myynnin & markkinoinnin yhdistäminen, Relevantit case-viittaukset (Gebwell, Nokia)</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei suoria mainintoja tuotekonfiguraattoreista/portaaliratkaisuista, Teknisen toteutuksen yksityiskohdat jäävät ohuiksi</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>SaaS- ja ohjelmistoalustat (scaleup–enterprise)</strong>
+                    <span class="score score--4">4/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Kasvubrändi, growth marketing ja MQL→SQL -sillan rakentaminen istuvat SaaS-yritysten GTM:ään. PLG/self-serve ja lokalisointi eivät ole näkyvästi esillä.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Kasvun muotoilu: brand + thought leadership, Markkinoinnin ja myynnin yhteispeli (ABM-henkinen), Enterprise-kohderyhmän ymmärrys</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei PLG/self-serve-optimoinnin mainintoja, Ei lokalisointistrategioiden korostusta</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Julkinen sektori, liitot ja järjestöt</strong>
+                    <span class="score score--2">2/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Viestintä on vahvasti B2B-ostamiseen suuntautunut eikä käsittele WCAG:ia, hankintaa tai jäsenpalveluja. Tarjonta voi tukea sidosryhmäviestintää, mutta se ei näy etusivulla.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Viestinnän ja brändin kehittäminen, Monimutkaisten organisaatioiden sidosryhmäymmärrys</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei saavutettavuus- tai hankintaprosessiviestejä, Ei integraatio- tai asiointipalvelujen mainintaa</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Kuluttajapalvelut, matkailu & tapahtumabrändit</strong>
+                    <span class="score score--1">1/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Fokus on puhtaasti B2B-ostokokemuksissa, eikä kuluttajaliiketoiminnan erityistarpeita mainita. Ecommerce, varaus ja loyalty eivät näy.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Vahva brändi- ja strategiaosaaminen</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei kuluttajabrändien tai matkailun ratkaisuja, Ei ecommerce-/varauskokemuksen viestintää</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Ammattilais- ja asiantuntijapalvelut (toimistot, konsultointi, design)</strong>
+                    <span class="score score--4">4/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Brändi, thought leadership ja kasvumarkkinointi vastaavat hyvin asiantuntijapalveluiden liidinhankintaan. Rekrytointi/EB ei näy, mutta myynnin ja markkinoinnin silta on vahvuus.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Brändi + thought leadership -fokus, Kasvumarkkinointi ja myynti–markkinointi -integraatio, Enterprise-prosessien kypsyys</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei EB/recruitment-tarjoaman korostusta, Ei eksplisiittistä ABM-terminologiaa etusivulla</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Energia, infra ja rakentamisen operaattorit</strong>
+                    <span class="score score--3">3/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Enterprise-tason B2B-fokus ja kaupallisen kokemuksen digitalisointi sopivat suurille operaattoreille. Tietoturvan, sääntelyn ja kriittisen viestinnän erityisvaatimukset eivät näy.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Kyky rakentaa digitaalisia kyvykkyyksiä ja prosesseja, Sidosryhmäviestinnän ja myynnin yhdistäminen</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei tietoturva-/compliance-viestejä, Ei operatiivisten järjestelmien (työmaa/kalusto) digitalisoinnin mainintoja</div>
+            </div>
+
+        </div>
+
+        <div class="card" style="margin-bottom:var(--s4);">
+            <h3>Avidly</h3>
+            <div class="card__meta">27 asiakasta tunnistettu</div>
+            
+            <h4 style="margin-top:var(--s3); margin-bottom:var(--s2); font-size:1rem;">Positioning per ICP:</h4>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Teolliset valmistajat ja insinööritalot (B2B vientivetoinen teollisuus)</strong>
+                    <span class="score score--2">2/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Etusivun viesti 'Muotoilemme kasvua' on hyvin geneerinen eikä kuvaa toimialaa tai haasteita. Tarjonnan ja casejen konkretia puuttuu.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Kasvufokus nivoutuu liiketoimintatavoitteisiin</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei toimialamainintoja tai haasteiden käsittelyä, Ei caseja tai palveluerittelyä</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>SaaS- ja ohjelmistoalustat (scaleup–enterprise)</strong>
+                    <span class="score score--3">3/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Kasvun muotoilun teema resonoi SaaS-yritysten tavoitteiden kanssa, mutta konkreettinen tarjoama (PLG/ABM, lokalisointi, konversiopolut) ei avaudu. Viesti jää liian yleiseksi.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Selkeä kasvulähtöisyys</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei SaaS-spesifejä ratkaisuja tai terminologiaa, Ei palvelu- tai teknologia-alueiden konkretiaa</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Julkinen sektori, liitot ja järjestöt</strong>
+                    <span class="score score--1">1/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Viesti ei huomioi julkisen sektorin erityisvaatimuksia (WCAG, hankinta, integraatiot). Ei toimialamainintoja tai referenssejä.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Yleinen kasvukärki voi tukea viestinnän kehitystä</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei saavutettavuus-/hankintamainintoja, Ei integraatio- tai asiointipalvelukomponentteja</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Kuluttajapalvelut, matkailu & tapahtumabrändit</strong>
+                    <span class="score score--2">2/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Geneerinen kasvulupaus on liian yleinen vastaamaan ecommerce-, varaus- ja loyalty-tarpeisiin. Ei näyttöjä tai palvelulistaa etusivulla.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Kasvun kehystäminen brändin ja markkinoinnin suuntaan</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei ecommerce- tai varausjärjestelmäviitteitä, Ei CRM/loyalty-viestintää</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Ammattilais- ja asiantuntijapalvelut (toimistot, konsultointi, design)</strong>
+                    <span class="score score--3">3/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Kasvuteesi istuu asiantuntijapalveluihin, mutta konkreettiset palvelut (ABM, EB, leadgen) eivät avaudu. Viesti kaipaa toimialarelevanssia.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Kasvubrändin muotoilun ajattelu</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei ABM/leadgen- tai EB-tarjooman kuvausta, Ei segmenttikohtaisia referenssejä</div>
+            </div>
+
+            <div style="margin-bottom:var(--s3); padding-bottom:var(--s3); border-bottom:1px solid var(--divider);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--s2);">
+                    <strong>Energia, infra ja rakentamisen operaattorit</strong>
+                    <span class="score score--1">1/5</span>
+                </div>
+                <p style="margin-bottom:var(--s2);">Ei mainintaa sääntelystä, tietoturvasta tai kriittisestä sidosryhmäviestinnästä. Viesti on liian geneerinen tälle segmentille.</p>
+                
+                <div><strong style="font-size:0.9rem;">Vahvuudet:</strong> Yleinen kasvukehys voi tukea strategiatyötä</div>
+                <div style="margin-top:4px;"><strong style="font-size:0.9rem;">Heikkoudet:</strong> Ei compliance-/tietoturvaviestintää, Ei toimialareferenssejä</div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- ICP PROFIILIT -->
+<section class="section section--tight" style="background:#f9fafb; padding: var(--s6) 0;">
+    <div class="container">
+        <h2>ICP-profiilit</h2>
+        <p class="lead">6 tunnistettua Ideal Customer Profile -profiilia</p>
+        <div class="grid grid--2" style="margin-top: var(--s4);">
+
+            <div class="card">
+                <h3>Teolliset valmistajat ja insinööritalot (B2B vientivetoinen teollisuus)</h3>
+                <div class="card__meta">Markkina-arvo: Very High</div>
+                
+                <p><strong>Koko:</strong> Enterprise</p>
+                <p><strong>Toimialat:</strong> Teollisuus ja valmistus, Konepajateollisuus, Prosessiteollisuus</p>
+                
+                <div style="margin-top:var(--s2);">
+                    <strong style="font-size:0.9rem;">Haasteet:</strong>
+                    <ul class="list" style="margin-top:8px;">
+                        <li>Monimutkaiset tuoteportfoliot ja tuotekonfiguraattorit</li><li>Kansainvälinen myynti ja jälleenmyyjäverkostot</li><li>Huolto- ja jälkimarkkinaportaalit</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top:var(--s2);"><strong style="font-size:0.9rem;">Esimerkit:</strong><br/>Konecranes, SSAB, Valtra, Raute, Evac</div>
+            </div>
+
+            <div class="card">
+                <h3>SaaS- ja ohjelmistoalustat (scaleup–enterprise)</h3>
+                <div class="card__meta">Markkina-arvo: High</div>
+                
+                <p><strong>Koko:</strong> Medium</p>
+                <p><strong>Toimialat:</strong> Ohjelmisto ja SaaS, Teknologia, Data ja analytiikka</p>
+                
+                <div style="margin-top:var(--s2);">
+                    <strong style="font-size:0.9rem;">Haasteet:</strong>
+                    <ul class="list" style="margin-top:8px;">
+                        <li>Kansainvälinen skaalaus ja lokalisointi</li><li>Kysynnän generointi (PLG/ABM)</li><li>Konversio ja self-serve-polkuihin optimointi</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top:var(--s2);"><strong style="font-size:0.9rem;">Esimerkit:</strong><br/>HappyOrNot, The Qt Company, Nomentia, Howspace, Brella</div>
+            </div>
+
+            <div class="card">
+                <h3>Julkinen sektori, liitot ja järjestöt</h3>
+                <div class="card__meta">Markkina-arvo: High</div>
+                
+                <p><strong>Koko:</strong> Large</p>
+                <p><strong>Toimialat:</strong> Julkishallinto, Järjestöt ja liitot, Säätiöt</p>
+                
+                <div style="margin-top:var(--s2);">
+                    <strong style="font-size:0.9rem;">Haasteet:</strong>
+                    <ul class="list" style="margin-top:8px;">
+                        <li>Hankintaprosessit ja kilpailutus</li><li>Saavutettavuus (WCAG) ja monikielisyys</li><li>Jäsen- ja asiointipalvelut sekä integraatiot</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top:var(--s2);"><strong style="font-size:0.9rem;">Esimerkit:</strong><br/>The City of Helsinki, City of Vantaa, Keva, The Confederation of Finnish Industries, Finnish Heart Association</div>
+            </div>
+
+            <div class="card">
+                <h3>Kuluttajapalvelut, matkailu & tapahtumabrändit</h3>
+                <div class="card__meta">Markkina-arvo: Medium</div>
+                
+                <p><strong>Koko:</strong> Medium</p>
+                <p><strong>Toimialat:</strong> Matkailu ja majoitus, Vapaa-aika ja viihde, Tapahtumat ja messut</p>
+                
+                <div style="margin-top:var(--s2);">
+                    <strong style="font-size:0.9rem;">Haasteet:</strong>
+                    <ul class="list" style="margin-top:8px;">
+                        <li>Sesonkivaihtelu ja kapasiteetin hallinta</li><li>Konversio ja lipun/majoituksen myynti</li><li>Loyalty/CRM ja toistuva asiointi</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top:var(--s2);"><strong style="font-size:0.9rem;">Esimerkit:</strong><br/>Powerpark, Flamingo Spa, Primehotels, Hotel Mestari, SuperPark</div>
+            </div>
+
+            <div class="card">
+                <h3>Ammattilais- ja asiantuntijapalvelut (toimistot, konsultointi, design)</h3>
+                <div class="card__meta">Markkina-arvo: Medium</div>
+                
+                <p><strong>Koko:</strong> Medium</p>
+                <p><strong>Toimialat:</strong> Konsultointi, Markkinointi ja viestintä, Design ja kehitys</p>
+                
+                <div style="margin-top:var(--s2);">
+                    <strong style="font-size:0.9rem;">Haasteet:</strong>
+                    <ul class="list" style="margin-top:8px;">
+                        <li>Laadukkaiden liidien generointi ja ABM</li><li>Rekrytointi ja työnantajabrändi</li><li>Referenssien ja osaamisen tuotteistus</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top:var(--s2);"><strong style="font-size:0.9rem;">Esimerkit:</strong><br/>Columbia Road, Avidly, Exove, Kuudes, Ellun Kanat</div>
+            </div>
+
+            <div class="card">
+                <h3>Energia, infra ja rakentamisen operaattorit</h3>
+                <div class="card__meta">Markkina-arvo: High</div>
+                
+                <p><strong>Koko:</strong> Large</p>
+                <p><strong>Toimialat:</strong> Energia ja vesi, Liikenne ja logistiikka, Rakentaminen ja infra</p>
+                
+                <div style="margin-top:var(--s2);">
+                    <strong style="font-size:0.9rem;">Haasteet:</strong>
+                    <ul class="list" style="margin-top:8px;">
+                        <li>Sääntely ja tietoturva</li><li>Asiakas- ja sidosryhmäviestintä kriittisissä palveluissa</li><li>Työmaa- ja kalustonhallinnan digitalisointi</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top:var(--s2);"><strong style="font-size:0.9rem;">Esimerkit:</strong><br/>Finferries, Ramirent, Keravan energia, Vantaan Valo, NYAB</div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+    <div class="container">
+        <p style="text-align: center; color: var(--muted-ink);">
+            Analyysi luotu 17.10.2025 17:09 | MEOM Competitor Analysis Tool
+        </p>
+    </div>
+</footer>
+
+</body>
+</html>

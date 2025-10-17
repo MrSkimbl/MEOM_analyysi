@@ -1,116 +1,240 @@
-# OpenAI API - Responses API & Web Search (2025)
+# OpenAI API Reference - GPT-5 ja Web Search
 
-## Responses API - Uusi tapa
+## Tärkeää: Responses API vs Chat Completions API
 
-OpenAI:n **Responses API** on uusi, yksinkertaisempi tapa käyttää GPT-5:tä.
+**Tässä projektissa käytetään RESPONSES API**, ei Chat Completions API:a.
 
-### Perusesimerkki
+### Miksi Responses API?
+
+- ✅ GPT-5 tuki
+- ✅ Web Search toimii (`tools=[{"type": "web_search"}]`)
+- ✅ Yksinkertaisempi käyttöliittymä
+
+### Milloin Chat Completions?
+
+- Vain GPT-4o ja vanhemmat mallit
+- Web Search **ei** toimi
+- Monimutkaisempi (`messages` array)
+
+---
+
+## GPT-5 Responses API (käytetään tässä projektissa)
+
+### Perus käyttö (EI web search)
 
 ```python
 from openai import OpenAI
 
-client = OpenAI()
+client = OpenAI(api_key="sk-...")
 
 response = client.responses.create(
     model="gpt-5",
-    input="Analysoi yritys Reaktor.com"
+    input="Analysoi yritys osoitteessa https://esimerkki.fi"
 )
 
 print(response.output_text)
 ```
 
-### Web Search -työkalu
+### Web Search (VAIN kilpailijahaussa)
 
 ```python
 response = client.responses.create(
     model="gpt-5",
-    tools=[{"type": "web_search"}],
-    input="Etsi kilpailijat yritykselle Reaktor.com Suomessa"
+    tools=[{"type": "web_search"}],  # Aktivoi web search
+    input="Etsi kilpailijat yritykselle X Suomen markkinassa"
 )
 
 print(response.output_text)
 ```
 
-### JSON-output
+### JSON-muotoinen vastaus
 
 ```python
-response = client.responses.create(
-    model="gpt-5",
-    tools=[{"type": "web_search"}],
-    input="Palauta JSON: Reaktorin kilpailijat Suomessa",
-    response_format="json"
-)
-
 import json
-data = json.loads(response.output_text)
-```
-
-## Mallit
-
-- `gpt-5` - Paras malli, tukee web search:ia
-- `gpt-5-mini` - Nopeampi, halvempi
-
-## Parametrit (Responses API)
-
-| Parametri | Kuvaus |
-|-----------|--------|
-| `model` | "gpt-5" tai "gpt-5-mini" |
-| `input` | Syöte (string) |
-| `tools` | Lista: [{"type": "web_search"}] |
-| `response_format` | "json" jos haluat JSON |
-| `max_tokens` | HUOM: GPT-5 ei välttämättä tue, kokeile ilman |
-
-## Vastauksen käsittely
-
-```python
-response = client.responses.create(...)
-
-# Tekstivastaus
-text = response.output_text
-
-# Tokenien käyttö (jos saatavilla)
-if hasattr(response, 'usage'):
-    tokens = response.usage.total_tokens
-```
-
-## Projektissa käytettävä koodi
-
-### Yritysanalyysi (ilman web search)
-
-```python
-from openai import OpenAI
-client = OpenAI()
 
 response = client.responses.create(
     model="gpt-5",
-    input=f"Analysoi yritys {url}. Palauta JSON muodossa..."
+    input="""Analysoi yritys ja palauta JSON:
+{
+  "name": "...",
+  "services": ["...", "..."]
+}
+
+TÄRKEÄÄ: Palauta VAIN JSON, ei muuta tekstiä.
+"""
 )
 
 data = json.loads(response.output_text)
-```
-
-### Kilpailijahaku (web search)
-
-```python
-response = client.responses.create(
-    model="gpt-5",
-    tools=[{"type": "web_search"}],
-    input=f"Etsi 5 kilpailijaa {url}. Palauta JSON..."
-)
-
-data = json.loads(response.output_text)
-```
-
-## Virheenkäsittely
-
-```python
-try:
-    response = client.responses.create(...)
-except Exception as e:
-    print(f"Virhe: {e}")
 ```
 
 ---
 
-**Lähde**: OpenAI Platform Docs - Responses API  
-**Päivitetty**: Lokakuu 2025
+## Projektin käyttö per vaihe
+
+| Vaihe | API | Web Search | Prompt-tyyppi |
+|-------|-----|-----------|---------------|
+| 1A: Yritysanalyysi | GPT-5 Responses | ❌ | JSON output |
+| 1B: Kilpailijahaku | GPT-5 Responses | ✅ | JSON output + Web |
+| 3: Asiakasnimet | GPT-5 Responses | ❌ | JSON output |
+| 4: ICP-analyysi | GPT-5 Responses | ❌ | JSON output |
+| 5: Etusivujen copyt | - | - | BeautifulSoup |
+| 6: Positioning | GPT-5 Responses | ❌ | JSON output |
+| 7: HTML-raportti | - | - | Python templating |
+
+---
+
+## Tärkeät parametrit
+
+### ✅ Tuetut parametrit (GPT-5)
+
+```python
+response = client.responses.create(
+    model="gpt-5",                           # Malli
+    input="prompt tähän",                    # Syöte (string)
+    tools=[{"type": "web_search"}],          # Web search (valinnainen)
+)
+```
+
+### ❌ EI tuetut parametrit
+
+```python
+# ÄLÄTEE NÄIN GPT-5:llä:
+response = client.responses.create(
+    model="gpt-5",
+    messages=[...],              # ❌ Vain Chat Completions API:ssa
+    max_tokens=1000,             # ❌ Käytä max_completion_tokens
+    temperature=0.7,             # ❌ Vain oletus (1) tuettu
+    response_format={"type": "json_object"}  # ❌ Ei tarvita, JSON toimii suoraan
+)
+```
+
+---
+
+## JSON-parsinta (paras käytäntö)
+
+```python
+import json
+
+try:
+    response = client.responses.create(
+        model="gpt-5",
+        input="""Palauta JSON:
+{
+  "key": "value"
+}
+
+TÄRKEÄÄ: Palauta VAIN JSON, ei selityksiä."""
+    )
+    
+    # Parsi JSON
+    data = json.loads(response.output_text)
+    
+except json.JSONDecodeError as e:
+    print(f"JSON-parsinta epäonnistui!")
+    print(f"Vastaus: {response.output_text[:500]}")
+    # Debug: katsele raakadataa
+    raise
+```
+
+---
+
+## Web Search - Milloin käyttää?
+
+### ✅ Käytä web searchissa:
+- Kilpailijahaku (tarvitaan ajantasaista markkinatietoa)
+- Tuoreita uutisia tarvittaessa
+
+### ❌ ÄLÄ käytä web searchia:
+- JSON-parsinta (asiakasnimet, ICP:t)
+- Analyysi joka perustuu annettuun tekstiin
+- Kaikki tekstipohjainen analyysi
+
+**Syy**: Web search hidastaa ja maksaa enemmän. Käytä vain kun tarvitaan reaaliaikaista tietoa.
+
+---
+
+## Virheenkäsittely
+
+```python
+from openai import OpenAI
+import json
+
+client = OpenAI(api_key=api_key)
+
+try:
+    response = client.responses.create(
+        model="gpt-5",
+        input=prompt
+    )
+    
+    # Parsi JSON
+    result = json.loads(response.output_text)
+    
+except json.JSONDecodeError as e:
+    print(f"[ERROR] JSON-parsinta epäonnistui")
+    print(f"Vastaus: {response.output_text[:500]}")
+    raise
+    
+except Exception as e:
+    print(f"[ERROR] {type(e).__name__}: {str(e)}")
+    raise
+```
+
+---
+
+## Mallit
+
+| Malli | API | Web Search | JSON | Käyttö projektissa |
+|-------|-----|-----------|------|-------------------|
+| `gpt-5` | Responses | ✅ | ✅ | **Kaikki vaiheet** |
+| `gpt-4o` | Chat Completions | ❌ | ✅ | Ei käytössä |
+| `gpt-4` | Chat Completions | ❌ | ❌ | Ei käytössä |
+
+---
+
+## Esimerkki: Kilpailijahaku (Web Search)
+
+```python
+from openai import OpenAI
+import json
+
+client = OpenAI()
+
+prompt = """
+Yritys: Reaktor Oy (https://reaktor.com)
+Palvelut: Digitaalinen transformaatio, ohjelmistokehitys
+Asiakkaat: Suuryritykset ja julkishallinto
+
+Etsi 5 kilpailijaa Suomen markkinassa.
+
+Palauta JSON:
+{
+  "competitors": [
+    {"name": "Yritys", "url": "https://..."}
+  ]
+}
+"""
+
+response = client.responses.create(
+    model="gpt-5",
+    tools=[{"type": "web_search"}],  # AKTIVOI WEB SEARCH
+    input=prompt
+)
+
+data = json.loads(response.output_text)
+print(data['competitors'])
+```
+
+---
+
+## Yhteenveto
+
+1. **Käytä `client.responses.create`** - EI `chat.completions.create`
+2. **Käytä `input` parametria** - EI `messages`
+3. **Web search** vain kilpailijahaussa (`tools=[{"type": "web_search"}]`)
+4. **JSON** toimii suoraan, ei tarvita `response_format`
+5. **Virheenkäsittely** aina JSON-parsinnassa
+
+## Dokumentaatio
+
+Virallinen dokumentaatio: https://platform.openai.com/docs/guides/tools-web-search?api-mode=responses&lang=python
